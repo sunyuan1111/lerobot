@@ -27,6 +27,30 @@ DEVICE=cuda make test-end-to-end                      # All E2E tests
 pre-commit run --all-files                           # Lint + format (ruff, typos, bandit, etc.)
 ```
 
+## Remote GPU SSH Targets
+
+Use the local `~/.ssh/config` as the source of truth for remote GPU access. Do
+not hardcode IPs, users, proxy ports, or plaintext passwords in this repository.
+
+Configured aliases on this workstation:
+
+```bash
+ssh rtx4090
+ssh a100-gpu001
+ssh a100-gpu002
+ssh a100-gpu003
+ssh a100-gpu003-direct
+```
+
+Notes:
+
+- `a100-gpu003` uses the configured `ProxyJump` path through `a100-gpu001`.
+- `a100-gpu003-direct` uses the direct proxy path from `~/.ssh/config`.
+- If authentication prompts repeatedly, set up SSH key login with `ssh-copy-id`
+  instead of storing a password in `AGENTS.md`.
+- For unstable VPN/proxy paths, verify a real SSH banner/login before assuming a
+  host is usable; TCP-open checks alone can be misleading.
+
 ## Architecture (`src/lerobot/`)
 
 - **`scripts/`** — CLI entry points (`lerobot-train`, `lerobot-eval`, `lerobot-record`, etc.), mapped in `pyproject.toml [project.scripts]`.

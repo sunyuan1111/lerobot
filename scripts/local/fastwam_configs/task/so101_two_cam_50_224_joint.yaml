@@ -1,0 +1,44 @@
+# @package _global_
+
+defaults:
+  - override /data: so101_two_cam
+  - override /model: fastwam_joint
+  - _self_
+
+# SO-101 双相机任务指令；同时给 text embedding 预计算脚本使用。
+override_instruction: "Pick up the object and place it in the target area."
+
+data:
+  train:
+    # A100 上的 50 条演示数据，视频已压到 224x224，两个相机横向拼接成 224x448。
+    dataset_dirs:
+      - /home/cuisen/data/lerobot/fastwam_so101_50_224
+    override_instruction: ${override_instruction}
+
+output_dir: ./runs/train/so101_two_cam_50_224_joint
+
+# 5B 级别模型先保守设置；如果显存富余，再把 batch_size 或累积步数调大。
+batch_size: 1
+num_workers: 2
+gradient_accumulation_steps: 4
+mixed_precision: "bf16"
+
+model:
+  mot_checkpoint_mixed_attn: true
+
+lr_scheduler_type: "cosine"
+learning_rate: 1.0e-4
+num_epochs: 1
+max_steps: 1000
+log_every: 10
+save_every: 200
+eval_every: 0
+eval_num_inference_steps: 10
+
+trainable_scope: "dit"
+max_grad_norm: 1.0
+weight_decay: 1.0e-2
+resume: null
+
+wandb:
+  enabled: false
